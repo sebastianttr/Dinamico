@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Dinamico</string>
+    <string name="title_activity_first_screen">FirstScreenActivity</string>
+    <string name="title_activity_first_screen_actitivy">FirstScreenActitivy</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_car_learning">CarLearningActivity</string>
+    <string name="title_activity_quiz">QuizActivity</string>
+    <string name="title_activity_failed_quiz">FailedQuizActivity</string>
+    <string name="title_activity_passed_quiz">PassedQuizActivity</string>
+</resources>
