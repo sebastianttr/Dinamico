@@ -125,7 +125,7 @@ fun BasicInfoItem(){
         text = "Your Name",
         style = TextStyle(
             fontWeight = FontWeight.SemiBold,
-            fontSize = 24.sp,
+            fontSize = 26.sp,
             fontFamily = Montserrat,
             textAlign = TextAlign.Center,
             color = Color.White
@@ -255,7 +255,6 @@ fun FriendSuggestionItem(){
         ){
             SButton(
                 text = "SEARCH MORE",
-                height = 40.dp,
                 colors = listOf(
                     Color(0xFFFBAB18),
                     Color(0xFFFEDE00)

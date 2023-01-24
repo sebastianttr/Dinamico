@@ -44,7 +44,8 @@ fun SButton(
     ),
     fontColor: Color = Color.Black,
     onClick: () -> Unit = {},
-    fontSize: TextUnit = Typography.h3.fontSize
+    fontSize: TextUnit = Typography.h3.fontSize,
+    padding: Dp = 0.dp
 ){
     Box(modifier = Modifier
         .clip(RoundedCornerShape(8.dp))

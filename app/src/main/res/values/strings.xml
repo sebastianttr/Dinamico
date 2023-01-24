@@ -8,4 +8,6 @@
     <string name="title_activity_quiz">QuizActivity</string>
     <string name="title_activity_failed_quiz">FailedQuizActivity</string>
     <string name="title_activity_passed_quiz">PassedQuizActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
 </resources>

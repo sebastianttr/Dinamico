@@ -220,7 +220,6 @@ class CarLearningActivity : ComponentActivity() {
                                 Box(modifier = Modifier.padding(top = 120.dp, bottom = 24.dp)){
                                     SButton(
                                         text = "TAKE TEST",
-                                        height = 40.dp,
                                         colors = listOf(
                                             Color(0xFFFBA818),
                                             Color(0xFFFEDE00)

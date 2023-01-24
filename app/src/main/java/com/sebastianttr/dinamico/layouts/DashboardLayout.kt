@@ -232,6 +232,9 @@ fun DashboardLayout(){
                         ),
                     )*/
                 }
+                item {
+                    Box(modifier = Modifier.height(62.dp).fillMaxWidth())
+                }
             }
 
         }

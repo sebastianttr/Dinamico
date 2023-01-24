@@ -22,7 +22,10 @@ sealed class Screen(val view: NavigationScreen) {
 }
 
 @Composable
-fun SetDefaultSystemColors(topBarColor: Color = MainMedium){
+fun SetDefaultSystemColors(
+    topBarColor: Color = MainMedium,
+    navbarColor: Color = MainStrong
+){
     val systemUiController = rememberSystemUiController()
 
     systemUiController.setStatusBarColor(
@@ -30,6 +33,6 @@ fun SetDefaultSystemColors(topBarColor: Color = MainMedium){
     )
 
     systemUiController.setNavigationBarColor(
-        color = MainStrong
+        color = navbarColor
     )
 }

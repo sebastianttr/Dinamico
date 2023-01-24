@@ -148,7 +148,7 @@ class PassedQuizActivity : ComponentActivity() {
                                 )
                             }
                             Text(
-                                text = " You have obtained this model",
+                                text = "You have obtained this model",
                                 style = TextStyle(
                                     color = Color.Gray,
                                     fontWeight = FontWeight.SemiBold,
@@ -168,7 +168,6 @@ class PassedQuizActivity : ComponentActivity() {
                         ){
                             SButton(
                                 text = "TO GARAGE",
-                                height = 40.dp,
                                 colors = listOf(
                                     Color(0xFFFBAB18),
                                     Color(0xFFFEDE00)

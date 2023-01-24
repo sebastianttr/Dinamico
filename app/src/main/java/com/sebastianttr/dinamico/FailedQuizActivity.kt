@@ -126,7 +126,6 @@ class FailedQuizActivity : ComponentActivity() {
                         ){
                             SButton(
                                 text = "TO GARAGE",
-                                height = 40.dp,
                                 colors = listOf(
                                     Color(0xFFFBAB18),
                                     Color(0xFFFEDE00)

@@ -31,7 +31,7 @@ val Typography = Typography(
     body1 = TextStyle(                      // Equivalent to Paragraph
         fontFamily = Montserrat,
         fontWeight = FontWeight.Normal,
-        fontSize = 17.28.sp
+        fontSize = 18.sp
     ),
     h6 = TextStyle(                         // Equivalent to VerySmall
         fontFamily = Montserrat,
@@ -41,11 +41,11 @@ val Typography = Typography(
     h3 = TextStyle(                         // Equivalent to Subtitle
         fontFamily = Montserrat,
         fontWeight = FontWeight.Normal,
-        fontSize = 25.sp
+        fontSize = 22.sp
     ),
     h1 = TextStyle(                         // Equivalent to Title
         fontFamily = Montserrat,
         fontWeight = FontWeight.Normal,
-        fontSize = 35.8.sp
+        fontSize = 36.sp
     )
 )
