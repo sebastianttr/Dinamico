@@ -2,6 +2,7 @@
 
 package com.sebastianttr.dinamico.layouts
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -14,9 +15,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -77,12 +76,12 @@ val listOfCars = listOf<VehicleModel>(
     VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
 )
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview
 @Composable
 fun DashboardLayout(){
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     var searchSectionState by remember { mutableStateOf(false)}
-    var gridCellsState by remember { mutableStateOf(GridCells.Fixed(1))}
 
     val arrowRotateAnimation: Float by animateFloatAsState(
         targetValue = if (searchSectionState) -180f else 0f,
@@ -236,7 +235,6 @@ fun DashboardLayout(){
                     Box(modifier = Modifier.height(62.dp).fillMaxWidth())
                 }
             }
-
         }
         TopAppBarSearchView(searchSectionState = searchSectionState)
     }

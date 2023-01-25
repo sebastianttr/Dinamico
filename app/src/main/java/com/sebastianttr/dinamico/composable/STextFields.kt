@@ -25,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -108,83 +110,86 @@ fun STextField(
     text:String,
     onValueChanged: (value:String) -> Unit,
     height: Dp = 28.dp,
-    inputDescription: String = ""
+    inputDescription: String = "",
+    passwordVisibility: Boolean = false
 ){
     var txt:String by remember { mutableStateOf("")}
     var textFieldFocused by remember { mutableStateOf(false) }
 
-    Column(
-
-    ) {
-        if(inputDescription.isNotEmpty())
-            Text(
-                inputDescription,
-                style = TextStyle(
-                    color = Color(0xFF686A87),
-                    fontFamily = Montserrat,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-                modifier = Modifier.padding(vertical = 10.dp)
-            )
-        Box(
-            modifier = Modifier
-                .height(height)
-                .clip(RoundedCornerShape(corner = CornerSize(8.dp)))
-                .border(
-                    width = 2.dp,
-                    shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                    color = Color(0xFF434456)
-                )
-
-
-        ) {
-            Box(modifier = Modifier.background(Color(0xFF25284F)).fillMaxHeight()){
-                BasicTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp)
-                        .align(Alignment.CenterStart)
-                        .onFocusChanged {
-                            textFieldFocused = it.isFocused
-                        },
-                    value = text,
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = Color.White
-                    ),
-                    maxLines = 1,
-                    onValueChange = {
-                        txt = it
-                        if(it.length <= 40)
-                            onValueChanged.invoke(it)
-                    },
-                    cursorBrush = SolidColor(Color.White)
-                )
-                if(text.isEmpty())
+    Box(Modifier.systemBarsPadding()) {
+        Box(Modifier.imePadding()) {
+            Column() {
+                if(inputDescription.isNotEmpty())
                     Text(
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        text = hint,
+                        inputDescription,
                         style = TextStyle(
+                            color = Color(0xFF686A87),
+                            fontFamily = Montserrat,
                             fontSize = 16.sp,
-                            color = Color(0xFF806A33)
+                            fontWeight = FontWeight.Medium,
+                        ),
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
+                Box(
+                    modifier = Modifier
+                        .height(height)
+                        .clip(RoundedCornerShape(corner = CornerSize(8.dp)))
+                        .border(
+                            width = 2.dp,
+                            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                            color = Color(0xFF434456)
                         )
-                    )
-                if(txt.isNotEmpty())
-                    Icon(
-                        Icons.Filled.Close,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .clickable {
-                                txt = ""
-                                onValueChanged.invoke(txt)
-                            }
-                            .padding(end = 16.dp),
-                        contentDescription = "clear_input",
-                        tint = Color.White
-                    )
+
+
+                ) {
+                    Box(modifier = Modifier.background(Color(0xFF25284F)).fillMaxHeight()){
+                        BasicTextField(
+                            visualTransformation = if (!passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                                .align(Alignment.CenterStart)
+                                .onFocusChanged {
+                                    textFieldFocused = it.isFocused
+                                },
+                            value = text,
+                            textStyle = TextStyle(
+                                fontSize = 16.sp,
+                                color = Color.White
+                            ),
+                            maxLines = 1,
+                            onValueChange = {
+                                txt = it
+                                if(it.length <= 40)
+                                    onValueChanged.invoke(it)
+                            },
+                            cursorBrush = SolidColor(Color.White)
+                        )
+                        if(text.isEmpty())
+                            Text(
+                                modifier = Modifier.align(Alignment.CenterStart),
+                                text = hint,
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    color = Color(0xFF806A33)
+                                )
+                            )
+                        if(txt.isNotEmpty())
+                            Icon(
+                                Icons.Filled.Close,
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .clickable {
+                                        txt = ""
+                                        onValueChanged.invoke(txt)
+                                    }
+                                    .padding(end = 16.dp),
+                                contentDescription = "clear_input",
+                                tint = Color.White
+                            )
+                    }
+                }
             }
         }
     }
-
 }

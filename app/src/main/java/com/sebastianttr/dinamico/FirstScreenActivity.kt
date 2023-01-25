@@ -1,5 +1,6 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -18,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -32,13 +35,25 @@ import com.sebastianttr.dinamico.ui.theme.AccentLight
 import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
-
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import com.sebastianttr.room.entites.Options
+import kotlinx.coroutines.launch
+@SuppressLint("CoroutineCreationDuringComposition")
 class FirstScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             SetDefaultSystemColors(topBarColor = Color(0xFF111224), navbarColor = AccentLight)
+
+            val coroutineScope = rememberCoroutineScope()
+            lateinit var db: AppDatabase
+            val ctx = LocalContext.current
+
+            coroutineScope.launch {
+                db = Database.getDb(ctx)
+            }
 
             DinamicoTheme {
                 // A surface container using the 'background' color from the theme
@@ -143,6 +158,10 @@ class FirstScreenActivity : ComponentActivity() {
                                     Color(0xFFFF936A)
                                 ),
                                 onClick = {
+                                    coroutineScope.launch {
+                                        db.optionsDao().insertOption(Options(10,"name","Guest","User"))
+                                    }
+
                                     startActivity(Intent(this@FirstScreenActivity,MainActivity::class.java))
                                 }
                             )

@@ -10,4 +10,5 @@
     <string name="title_activity_passed_quiz">PassedQuizActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
 </resources>

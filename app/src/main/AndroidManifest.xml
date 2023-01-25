@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.sebastianttr.dinamico">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,6 +15,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Dinamico"
         tools:targetApi="31">
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:label="@string/title_activity_splash"
+            android:theme="@style/Theme.Dinamico" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
@@ -25,15 +37,9 @@
             android:theme="@style/Theme.Dinamico" />
         <activity
             android:name=".FirstScreenActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/title_activity_first_screen"
-            android:theme="@style/Theme.Dinamico" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.Dinamico" />
         <activity
             android:name=".PassedQuizActivity"
             android:exported="false"
@@ -46,7 +52,7 @@
             android:theme="@style/Theme.Dinamico" />
         <activity
             android:name=".QuizActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/title_activity_quiz"
             android:theme="@style/Theme.Dinamico" />
         <activity
@@ -60,8 +66,7 @@
             android:exported="false"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Dinamico">
-        </activity>
+            android:theme="@style/Theme.Dinamico" />
     </application>
 
 </manifest>

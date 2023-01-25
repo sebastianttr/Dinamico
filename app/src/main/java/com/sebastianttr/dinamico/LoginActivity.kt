@@ -1,5 +1,6 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -17,35 +17,55 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.composable.STextField
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
 import com.sebastianttr.dinamico.layouts.dpToPx
+import com.sebastianttr.dinamico.models.User
 import com.sebastianttr.dinamico.ui.theme.AccentLight
 import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
+import com.sebastianttr.dinamico.utils.md5
+import com.sebastianttr.dinamico.utils.toHex
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import com.sebastianttr.room.entites.Options
+import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
 
-            var userName by remember { mutableStateOf("")}
-            var passWord by remember { mutableStateOf("")}
-
+            var email by remember { mutableStateOf("")}
+            var password by remember { mutableStateOf("")}
+            var coroutineScope = rememberCoroutineScope()
+            val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
+            var errorMessage by remember {
+                mutableStateOf("")
+            }
 
             SetDefaultSystemColors(topBarColor = AccentLight, navbarColor = Color(0xFF25284F))
 
+            lateinit var db: AppDatabase
+            val ctx = LocalContext.current
+
+            coroutineScope.launch {
+                db = Database.getDb(ctx)
+            }
 
             DinamicoTheme {
                 // A surface container using the 'background' color from the theme
@@ -103,20 +123,29 @@ class LoginActivity : ComponentActivity() {
                                 verticalArrangement = Arrangement.spacedBy(20.dp)
                             ) {
                                 STextField(
-                                    text = userName,
+                                    text = email,
                                     onValueChanged = {
-                                         userName = it;
+                                        email = it;
                                     },
                                     height = 42.dp,
                                     inputDescription = "Email"
                                 )
                                 STextField(
-                                    text = passWord,
+                                    text = password,
                                     onValueChanged = {
-                                         passWord = it;
+                                         password = it;
                                     },
                                     height = 42.dp,
-                                    inputDescription = "Password"
+                                    inputDescription = "Password",
+                                    passwordVisibility = true
+                                )
+                                Text(
+                                    text = errorMessage,
+                                    style = TextStyle(
+                                        fontFamily = Montserrat,
+                                        color = AccentStrong,
+                                        fontSize = 16.sp
+                                    )
                                 )
                             }
                             Row(Modifier.fillMaxWidth(),
@@ -146,7 +175,35 @@ class LoginActivity : ComponentActivity() {
                                             Color(0xFFFEDE00)
                                         ),
                                         onClick = {
+                                            coroutineScope.launch {
+                                                var res = userClientAPI.authUser(
+                                                    User(
+                                                        name = "userName",
+                                                        email = email,
+                                                        password = md5(password).toHex()
+                                                    )
+                                                )
+                                                if(res.code() == 200){
+                                                    val user: User = res.body()!!
+                                                    if(user.email == "nan"){
+                                                        errorMessage = "Email or password incorrect"
+                                                    }
+                                                    else {
+                                                        db.optionsDao().insertOptions(
+                                                            listOf(
+                                                                Options(10,"name",user.name,"User"),
+                                                                Options(11,"email",user.email,"User"),
+                                                                Options(12,"password",user.password,"User"),
+                                                            )
+                                                        )
 
+                                                        // move to a different activity.
+                                                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                                        startActivity(intent)
+                                                        finish()
+                                                    }
+                                                }
+                                            }
                                         }
                                     )
                                 }

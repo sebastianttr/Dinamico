@@ -1,14 +1,11 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -29,21 +26,22 @@ import com.sebastianttr.dinamico.layouts.ProfileLayout
 import com.sebastianttr.dinamico.layouts.SettingsLayout
 import com.sebastianttr.dinamico.models.BottomNavItemModel
 import com.sebastianttr.dinamico.ui.theme.AccentLight
-import com.sebastianttr.dinamico.ui.theme.AccentMedium
 import com.sebastianttr.dinamico.ui.theme.MainStrong
-import java.util.logging.Logger
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.core.view.WindowCompat
-import com.sebastianttr.dinamico.layouts.dpToPx
+import androidx.lifecycle.lifecycleScope
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
+import com.sebastianttr.room.database.Database
+import io.reactivex.Completable
+import kotlinx.coroutines.launch
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch{
+            val db = Database.getDb(applicationContext)
+        }
 
         setContent {
             val navController = rememberNavController()
@@ -72,8 +70,6 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         BottomNavigation(modifier =
                             Modifier.height(80.dp)
-
-
                         ) {
                             val navBackStackEntry by navController.currentBackStackEntryAsState()
                             val currentDestination = navBackStackEntry?.destination

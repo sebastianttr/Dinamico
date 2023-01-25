@@ -278,11 +278,12 @@ fun SBorderedColumnDailyChallenges(
 
 @Composable
 fun SBorderedColumnSettingsItemToggle(
+    state: Boolean,
     text: String,
     onChange: (Boolean) -> Unit = {}
 ){
     var toggleButtonState by remember {
-        mutableStateOf(false)
+        mutableStateOf(state)
     }
 
     val stateBasedPositioning by animateFloatAsState(
@@ -308,12 +309,12 @@ fun SBorderedColumnSettingsItemToggle(
                 fontWeight = FontWeight.Medium,
                 color = Color.White
             ),
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(0.7f)
         )
         Box(modifier =
-        Modifier
-            .width(68.dp)
-            .height(26.5.dp)
+            Modifier
+                .width(68.dp)
+                .height(26.5.dp)
         ){
             // Uselected
             Box(modifier = Modifier
@@ -323,6 +324,7 @@ fun SBorderedColumnSettingsItemToggle(
                 .fillMaxWidth()
                 .clickable(onClick = {
                     toggleButtonState = !toggleButtonState
+                    onChange(toggleButtonState)
                 })
             ) {
                 Box(modifier = Modifier.fillMaxSize().background(Color(0xFF434456)))

@@ -98,6 +98,21 @@ class PassedQuizActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                     ){
+                        Box(
+                            modifier = Modifier.padding(top = 194.dp).fillMaxWidth().align(Alignment.TopCenter)
+                        ){
+                            Text(
+                                modifier = Modifier.align(Alignment.TopCenter),
+                                text = "Congratulations!",
+                                style = TextStyle(
+                                    color = Color(0xFF9398E1),
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 36.sp,
+                                    fontFamily = Montserrat,
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                        }
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,

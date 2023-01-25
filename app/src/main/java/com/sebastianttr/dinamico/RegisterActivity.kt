@@ -1,6 +1,9 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -8,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -18,32 +20,58 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.composable.STextField
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
 import com.sebastianttr.dinamico.layouts.dpToPx
+import com.sebastianttr.dinamico.models.User
 import com.sebastianttr.dinamico.ui.theme.AccentLight
+import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
+import com.sebastianttr.dinamico.utils.md5
+import com.sebastianttr.dinamico.utils.toHex
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import com.sebastianttr.room.database.dbOptions
+import com.sebastianttr.room.entites.Options
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             var email by remember { mutableStateOf("") }
             var userName by remember { mutableStateOf("") }
-            var passWord by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
             var repeatPassword by remember { mutableStateOf("") }
+            val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
+            val coroutineScope: CoroutineScope = rememberCoroutineScope()
+            var errorMessage by remember {
+                mutableStateOf("")
+            }
 
             SetDefaultSystemColors(topBarColor = AccentLight, navbarColor = Color(0xFF25284F))
+
+            lateinit var db: AppDatabase
+            val ctx = LocalContext.current
+
+            coroutineScope.launch {
+                db = Database.getDb(ctx)
+            }
 
             DinamicoTheme {
                 // A surface container using the 'background' color from the theme
@@ -117,12 +145,13 @@ class RegisterActivity : ComponentActivity() {
                                     inputDescription = "Email"
                                 )
                                 STextField(
-                                    text = passWord,
+                                    text = password,
                                     onValueChanged = {
-                                        passWord = it
+                                        password = it
                                     },
                                     height = 42.dp,
-                                    inputDescription = "Password"
+                                    inputDescription = "Password",
+                                    passwordVisibility = true
                                 )
                                 STextField(
                                     text = repeatPassword,
@@ -130,7 +159,16 @@ class RegisterActivity : ComponentActivity() {
                                         repeatPassword = it
                                     },
                                     height = 42.dp,
-                                    inputDescription = "Repeat Password"
+                                    inputDescription = "Repeat Password",
+                                    passwordVisibility = true
+                                )
+                                Text(
+                                    text = errorMessage,
+                                    style = TextStyle(
+                                        fontFamily = Montserrat,
+                                        color = AccentStrong,
+                                        fontSize = 16.sp
+                                    )
                                 )
                             }
                             Row(Modifier.fillMaxWidth(),
@@ -160,7 +198,46 @@ class RegisterActivity : ComponentActivity() {
                                             Color(0xFFFEDE00)
                                         ),
                                         onClick = {
+                                            if(password.length >= 8
+                                                && password == repeatPassword
+                                                && email.isNotEmpty() && email.contains("@")
+                                                && userName.isNotEmpty()
+                                            ) {
+                                                Log.i("Register","Registering")
+                                                // all good, send request
+                                                coroutineScope.launch {
+                                                    userClientAPI.addUser(
+                                                        User(
+                                                            name = userName,
+                                                            email = email,
+                                                            password = md5(password).toHex()
+                                                        )
+                                                    )
 
+                                                    // set the user profile
+                                                    db.optionsDao().insertOptions(
+                                                        listOf(
+                                                            Options(10,"name",userName,"User"),
+                                                            Options(11,"email",email,"User"),
+                                                            Options(12,"password",md5(password).toHex(),"User"),
+                                                        )
+                                                    )
+
+                                                    // move to a different activity.
+                                                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                                                    startActivity(intent)
+                                                    finish()
+                                                }
+                                            }
+                                            if (password.length < 8) {
+                                                errorMessage = "Password is too short!"
+                                            }
+                                            if (password != repeatPassword) {
+                                                errorMessage = "Repeated password is not the same!"
+                                            }
+                                            if (!email.contains("@")){
+                                                errorMessage = "Invalid email!"
+                                            }
                                         }
                                     )
                                 }

@@ -1,5 +1,6 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -41,6 +42,7 @@ import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
 
 class CarLearningActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

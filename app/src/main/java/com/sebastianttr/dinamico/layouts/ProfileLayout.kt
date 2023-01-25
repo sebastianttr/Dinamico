@@ -1,5 +1,6 @@
 package com.sebastianttr.dinamico.layouts
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,8 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -31,6 +32,9 @@ import com.sebastianttr.dinamico.R
 import com.sebastianttr.dinamico.composable.*
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
 import com.sebastianttr.dinamico.ui.theme.*
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileLayout(){
@@ -119,10 +123,25 @@ fun ProfileHeader(){   // Top Image with banner an
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun BasicInfoItem(){
+    val coroutineScope = rememberCoroutineScope()
+    lateinit var db: AppDatabase
+    val ctx = LocalContext.current
+
+    var userName by remember {
+        mutableStateOf("")
+    }
+
+    coroutineScope.launch {
+        db = Database.getDb(ctx)
+        userName = db.optionsDao().findAllByKey("name")[0].value!!
+    }
+
+
     Text(
-        text = "Your Name",
+        text = userName,
         style = TextStyle(
             fontWeight = FontWeight.SemiBold,
             fontSize = 26.sp,
@@ -131,17 +150,6 @@ fun BasicInfoItem(){
             color = Color.White
         ),
         modifier = Modifier.padding(vertical = 14.dp)
-    )
-    Text(
-        text = "Joined February 2022",
-        style = TextStyle(
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-            fontFamily = Montserrat,
-            textAlign = TextAlign.Center,
-            color = Color.White
-        ),
-        // modifier = Modifier.padding(vertical = 14.dp)
     )
 
     Row(

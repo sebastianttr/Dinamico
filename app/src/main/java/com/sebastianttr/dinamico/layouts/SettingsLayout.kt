@@ -1,36 +1,72 @@
 package com.sebastianttr.dinamico.layouts
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.sebastianttr.dinamico.R
+import com.sebastianttr.dinamico.FirstScreenActivity
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.*
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
-import com.sebastianttr.dinamico.ui.theme.MainMedium
+import com.sebastianttr.dinamico.models.User
+import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.Montserrat
+import com.sebastianttr.dinamico.utils.md5
+import com.sebastianttr.dinamico.utils.toHex
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import com.sebastianttr.room.entites.Options
+import kotlinx.coroutines.launch
 
+
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SettingsLayout(){
-    val systemUiController = rememberSystemUiController()
-
-    systemUiController.setStatusBarColor(
-        color = MainMedium
-    )
-
     SetDefaultSystemColors(topBarColor = Color(0xFF111224))
+
+    var generalSettings: List<Options> by remember { mutableStateOf(listOf()) }
+    var privacySettings: List<Options> by remember { mutableStateOf(listOf()) }
+    val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
+
+    var user: String by remember {
+        mutableStateOf("Guest")
+    }
+
+    var newPassword by remember {
+        mutableStateOf("")
+    }
+    var repeatNewPassword by remember {
+        mutableStateOf("")
+    }
+    var errorMessage by remember {
+        mutableStateOf("")
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    lateinit var db: AppDatabase
+    val ctx = LocalContext.current
+
+    coroutineScope.launch {
+        db = Database.getDb(ctx)
+
+        generalSettings = db.optionsDao().findAllByTag("General")
+        privacySettings = db.optionsDao().findAllByTag("Privacy")
+        user = db.optionsDao().findAllByKey("name")[0].value!!
+    }
 
     Surface(
         modifier = Modifier
@@ -53,50 +89,100 @@ fun SettingsLayout(){
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ){
             item {
-                Text(
-                    text = "Your profile",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = TextStyle(
-                        fontFamily = Montserrat,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 22.sp,
-                        color = Color.White,
-                    )
-                )
-            }
-            item {
-                STextField(
-                    text = "hello",
-                    onValueChanged = {},
-                    height = 42.dp,
-                    inputDescription = "Name"
-                )
-            }
-            item {
-                STextField(
-                    text = "hello",
-                    onValueChanged = {},
-                    height = 42.dp,
-                    inputDescription = "Email"
-                )
-            }
-            item {
-                STextField(
-                    text = "hello",
-                    onValueChanged = {},
-                    height = 42.dp,
-                    inputDescription = "Password"
-                )
-            }
-            item {
-                SButton(
-                    text = "SAVE",
-                    height = 40.dp,
-                    colors = listOf(
-                        Color(0xFFFBAB18),
-                        Color(0xFFFEDE00)
-                    )
-                )
+                Column() {
+                    if(user != "Guest"){
+                        Text(
+                            text = "Your profile",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp),
+                            style = TextStyle(
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 22.sp,
+                                color = Color.White,
+                            )
+                        )
+                        STextField(
+                            text = user,
+                            onValueChanged = {
+                                user = it
+                            },
+                            height = 42.dp,
+                            inputDescription = "Name"
+                        )
+                        STextField(
+                            text = newPassword,
+                            onValueChanged = {
+                                newPassword = it
+                            },
+                            height = 42.dp,
+                            inputDescription = "New Password",
+                            passwordVisibility = true
+                        )
+                        STextField(
+                            text = repeatNewPassword,
+                            onValueChanged = {
+                                repeatNewPassword = it
+                            },
+                            height = 42.dp,
+                            inputDescription = "Repeat Password",
+                            passwordVisibility = true
+                        )
+                        Text(
+                            text = errorMessage,
+                            style = TextStyle(
+                                fontFamily = Montserrat,
+                                color = AccentStrong,
+                                fontSize = 16.sp
+                            )
+                        )
+                        Box(modifier = Modifier.padding(top = 16.dp)){
+                            SButton(
+                                text = "SAVE",
+                                height = 40.dp,
+                                colors = listOf(
+                                    Color(0xFFFBAB18),
+                                    Color(0xFFFEDE00)
+                                ),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        db.optionsDao().updateOption(
+                                            Options(10,"name",user,"User"),
+                                        )
+
+                                        if(user.length >= 10 &&
+                                            newPassword == repeatNewPassword){
+                                            db.optionsDao().insertOptions(
+                                                listOf(
+                                                    Options(10,"name",user,"User"),
+                                                    Options(12,"password",newPassword,"User"),
+                                                )
+                                            )
+
+                                            userClientAPI.updateUser(
+                                                User(
+                                                    name = user,
+                                                    email = db.optionsDao().findAllByKey("email")[0].value!!,
+                                                    password = md5(newPassword.ifEmpty { db.optionsDao().findAllByKey("password")[0].value!! }).toHex()
+                                                )
+                                            )
+                                        }
+
+                                        if(newPassword.isNotEmpty() && newPassword.length <= 10){
+                                            errorMessage = "Password is too short"
+                                        }
+
+                                        if(newPassword != repeatNewPassword){
+                                            errorMessage = "Repeated Password is not the same!"
+                                        }
+
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
             }
             item {
                 Column() {
@@ -111,15 +197,25 @@ fun SettingsLayout(){
                         )
                     )
                     SBorderedColumn {
-                        SBorderedColumnSettingsItemToggle("Notifications")
-                        SBorderedColumnItemDivider()
-                        SBorderedColumnSettingsItemToggle("Dark Theme")
-                        SBorderedColumnItemDivider()
-                        SBorderedColumnSettingsItemToggle("Open Animation")
-                        SBorderedColumnItemDivider()
-                        SBorderedColumnSettingsItemToggle("Receive friend requests")
-                        SBorderedColumnItemDivider()
-                        SBorderedColumnSettingsItemToggle("Set profile to 'Public'")
+                        Column() {
+                            var i = 0;
+                            for(option in generalSettings){
+                                SBorderedColumnSettingsItemToggle(
+                                    state = option.value.toBoolean(),
+                                    text = option.key!!,
+                                    onChange = {
+                                        coroutineScope.launch {
+                                            db.optionsDao().updateOption(option.copy(value = it.toString()))
+                                            generalSettings = db.optionsDao().findAllByTag("General")
+                                        }
+                                    }
+                                )
+                                i++;
+                                if(i+1 <= generalSettings.size)
+                                    SBorderedColumnItemDivider()
+
+                            }
+                        }
                     }
                 }
             }
@@ -136,14 +232,28 @@ fun SettingsLayout(){
                         )
                     )
                     SBorderedColumn {
-                        SBorderedColumnSettingsItemToggle("Personalization and tracking for advertising")
+                        var i = 0;
+                        for(option in privacySettings){
+                            SBorderedColumnSettingsItemToggle(
+                                state = option.value.toBoolean(),
+                                text = option.key!!,
+                                onChange = {
+                                    coroutineScope.launch {
+                                        db.optionsDao().updateOption(option.copy(value = it.toString()))
+                                        privacySettings = db.optionsDao().findAllByTag("Privacy")
+                                    }
+                                }
+                            )
+                            i++;
+                            if(i+1 <= privacySettings.size)
+                                SBorderedColumnItemDivider()
+
+                        }
                     }
                 }
             }
             item {
-                Column(
-                    Modifier.padding(bottom = 60.dp)
-                ) {
+                Column() {
                         Text(
                         text = "Delete Account",
                         modifier = Modifier.fillMaxWidth(),
@@ -177,16 +287,62 @@ fun SettingsLayout(){
                                 colors = listOf(
                                     Color(0xFFB91010),
                                     Color(0xFFDC5959)
-                                )
+                                ),
+                                onClick = {
+                                    coroutineScope.launch {
+
+                                        userClientAPI.deleteUser(
+                                            User(
+                                                db.optionsDao().findAllByKey("name")[0].value!!,
+                                                db.optionsDao().findAllByKey("email")[0].value!!,
+                                                db.optionsDao().findAllByKey("password")[0].value!!
+                                            )
+                                        )
+
+                                        db.optionsDao().deleteByKey("name")
+                                        db.optionsDao().deleteByKey("email")
+                                        db.optionsDao().deleteByKey("password")
+
+                                        val intent = Intent(ctx.applicationContext, FirstScreenActivity::class.java)
+                                        ctx.startActivity(intent)
+                                    }
+                                }
                             )
                         }
                     }
                 }
             }
 
+            item {
+                Box(modifier = Modifier.padding(bottom = 60.dp)){
+                    SButton(
+                        text = "LOG OUT",
+                        height = 40.dp,
+                        colors = listOf(
+                            Color(0xFFFBAB18),
+                            Color(0xFFFEDE00)
+                        ),
+                        onClick = {
+                            coroutineScope.launch {
+                                val userOption:Options = db.optionsDao().findAllByKey("name")[0]
+                                userOption.value = ""
+                                db.optionsDao().updateOption(userOption)
+
+                                db.optionsDao().deleteByKey("name")
+                                db.optionsDao().deleteByKey("email")
+                                db.optionsDao().deleteByKey("password")
+                            }
+
+                            val intent = Intent(ctx.applicationContext, FirstScreenActivity::class.java)
+                            ctx.startActivity(intent)
+                        }
+                    )
+                }
+            }
         }
-
     }
+}
 
+fun navigateToFirstScreen(){
 
 }

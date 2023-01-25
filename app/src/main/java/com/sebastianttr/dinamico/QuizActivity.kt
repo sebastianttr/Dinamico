@@ -19,9 +19,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -238,7 +238,7 @@ class QuizActivity : ComponentActivity() {
                                 )
                             }
                             LazyVerticalGrid(
-                                cells = GridCells.Fixed(2),
+                                columns = GridCells.Fixed(2),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 content = {
