@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.*
 import com.sebastianttr.dinamico.layouts.dpToPx
 import com.sebastianttr.dinamico.models.VehicleModel
@@ -42,9 +44,12 @@ import com.sebastianttr.dinamico.ui.theme.AccentLight
 import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import kotlinx.coroutines.launch
 
 class CarLearningActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -57,6 +62,20 @@ class CarLearningActivity : ComponentActivity() {
             )
 
             val vehicleData: VehicleModel = intent.getSerializableExtra("carData") as VehicleModel
+
+            var coroutineScope = rememberCoroutineScope()
+
+            lateinit var db: AppDatabase
+            val ctx = LocalContext.current
+
+            var isGuest by remember {
+                mutableStateOf(true)
+            }
+
+            coroutineScope.launch {
+                db = Database.getDb(ctx)
+                isGuest = db.optionsDao().findAllByKey("name")[0].value != "Guest"
+            }
 
             DinamicoTheme {
                 // A surface container using the 'background' color from the theme
@@ -176,65 +195,68 @@ class CarLearningActivity : ComponentActivity() {
                             }
                         }
                         item {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .padding(vertical = 40.dp)
-                                        .height(36.dp)
-                                        .fillMaxWidth(),
-                                    painter = painterResource(id = R.drawable.checker), 
-                                    contentDescription = "checker"
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(vertical = 10.dp),
-                                    text = "Are you ready to test yourself and obtain this car?",
-                                    style = TextStyle(
-                                        fontFamily = Montserrat,
-                                        color = Color.White,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 26.sp,
-                                        textAlign = TextAlign.Center
+                            if(isGuest) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .padding(vertical = 40.dp)
+                                            .height(36.dp)
+                                            .fillMaxWidth(),
+                                        painter = painterResource(id = R.drawable.checker),
+                                        contentDescription = "checker"
                                     )
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(vertical = 16.dp),
-                                    text = "Don’t make mistakes or you’ll fail!",
-                                    style = TextStyle(
-                                        fontFamily = Montserrat,
-                                        color = AccentStrong,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 16.sp,
-                                        textAlign = TextAlign.Center,
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(vertical = 10.dp),
+                                        text = "Are you ready to test yourself and obtain this car?",
+                                        style = TextStyle(
+                                            fontFamily = Montserrat,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 26.sp,
+                                            textAlign = TextAlign.Center
+                                        )
                                     )
-                                )
-                                Box(modifier = Modifier.padding(top = 120.dp, bottom = 24.dp)){
-                                    SButton(
-                                        text = "TAKE TEST",
-                                        colors = listOf(
-                                            Color(0xFFFBA818),
-                                            Color(0xFFFEDE00)
-                                        ),
-                                        onClick = {
-                                            // Go to the right quiz.
-                                            context.startActivity(
-                                                Intent(context,QuizActivity::class.java)
-                                                    .putExtra("carData",vehicleData)
-                                            )
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(vertical = 16.dp),
+                                        text = "Don’t make mistakes or you’ll fail!",
+                                        style = TextStyle(
+                                            fontFamily = Montserrat,
+                                            color = AccentStrong,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 16.sp,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                    )
+                                    Box(modifier = Modifier.padding(top = 120.dp, bottom = 24.dp)) {
+                                        SButton(
+                                            text = "TAKE TEST",
+                                            colors = listOf(
+                                                Color(0xFFFBA818),
+                                                Color(0xFFFEDE00)
+                                            ),
+                                            onClick = {
+                                                // Go to the right quiz.
+                                                context.startActivity(
+                                                    Intent(context, QuizActivity::class.java)
+                                                        .putExtra("carData", vehicleData)
+                                                )
 
-                                        }
-                                    )
+                                            }
+                                        )
+                                    }
                                 }
-
                             }
+                            else
+                                ParagraphDivider(32.dp)
                         }
                     }
                 }

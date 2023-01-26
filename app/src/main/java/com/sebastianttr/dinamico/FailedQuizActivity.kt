@@ -47,7 +47,7 @@ class FailedQuizActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
 
-            var context = LocalContext.current
+            val context = LocalContext.current
 
             val appearAnimation: Float by animateFloatAsState(
                 targetValue = if (startAnimationFlag) 1f else 0f,

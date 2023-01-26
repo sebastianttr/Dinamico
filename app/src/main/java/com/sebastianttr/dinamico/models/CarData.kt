@@ -9,6 +9,7 @@ val listOfCars =
         "Ferrari",
         "360",
         R.drawable.ferrari_360,
+        R.drawable.f360_own,
         R.drawable.f360_cover,
         listOf(
             VehicleInfo("Overview",
@@ -84,6 +85,7 @@ val listOfCars =
         "Ferrari",
         "SF90",
         R.drawable.ferrari_sf90,
+        R.drawable.sf90_own,
         R.drawable.sf90_cover,
         listOf(
             VehicleInfo("Overview",
@@ -159,6 +161,7 @@ val listOfCars =
         "Ferrari",
         "296 GTB",
         R.drawable.ferrari_296gtb,
+        R.drawable.f296_own,
         R.drawable.f296gtb_cover,
         listOf(
             VehicleInfo("Overview",
@@ -234,6 +237,7 @@ val listOfCars =
         "Ferrari",
         "F40",
         R.drawable.ferrari_f40,
+        R.drawable.f40_own,
         R.drawable.f40_cover,
         listOf(
             VehicleInfo("Overview",
@@ -309,6 +313,7 @@ val listOfCars =
         "Ferrari",
         "F8 Tributo",
         R.drawable.ferrari_f8_tributo,
+        R.drawable.f8_own,
         R.drawable.f8_cover,
         listOf(
             VehicleInfo("Overview",

@@ -71,7 +71,9 @@ import kotlinx.coroutines.launch
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
+    "UnrememberedMutableState"
+)
 @Preview
 @Composable
 fun DashboardLayout(){
@@ -93,14 +95,43 @@ fun DashboardLayout(){
         mutableStateOf(listOfCars)
     };
 
-    var coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
 
     lateinit var db: AppDatabase
     val ctx = LocalContext.current
 
+    var ownedModels by remember {
+        mutableStateOf(emptyList<Int>())
+    }
+
     coroutineScope.launch {
         db = Database.getDb(ctx)
+
+
+
+
+        if(db.optionsDao().findAllByKey("name")[0].value != "Guest"){
+            val user = User(
+                db.optionsDao().findAllByKey("name")[0].value!!,
+                db.optionsDao().findAllByKey("email")[0].value!!,
+                db.optionsDao().findAllByKey("password")[0].value!!,
+            )
+
+            Log.i("dwa","Getting: ${user.email} ${user.name}")
+
+            ownedModels = userClientAPI.getOwnedCarModel(
+                User(
+                    db.optionsDao().findAllByKey("name")[0].value!!,
+                    db.optionsDao().findAllByKey("email")[0].value!!,
+                    db.optionsDao().findAllByKey("password")[0].value!!,
+                )
+            ).body()!!
+        }
+
+        Log.i("dwa","Got it")
+
+
     }
 
     SetDefaultSystemColors(Color(0xFFFBAB18))
@@ -201,18 +232,8 @@ fun DashboardLayout(){
                                     topButtonText = "ALL CARS"
 
                                     // get all models and filter
-                                    coroutineScope.launch {
-                                        val ownedModels: List<Int> = userClientAPI.getOwnedCarModel(
-                                            User(
-                                                db.optionsDao().findAllByKey("name")[0].value!!,
-                                                db.optionsDao().findAllByKey("email")[0].value!!,
-                                                db.optionsDao().findAllByKey("password")[0].value!!,
-                                            )
-                                        ).body()!!
 
-                                        carsList = listOfCars.filter { it.id in ownedModels }
-                                    }
-
+                                    carsList = listOfCars.filter { it.id in ownedModels }
                                 }else {
                                     topButtonText = "OWNED MODELS"
                                     carsList = listOfCars
@@ -229,14 +250,20 @@ fun DashboardLayout(){
                                 .align(Alignment.CenterHorizontally),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ){
-                            DashboardVehicleItem(item = carsList[index], onClick = {
+                            DashboardVehicleItem(
+                                item = carsList[index],
+                                owned = carsList[index].id in ownedModels,
+                                onClick = {
                                 context.startActivity(
                                     Intent(context,CarLearningActivity::class.java)
                                         .putExtra("carData",carsList[index])
                                 )
                             })
                             if(index + 1 < carsList.size)
-                                DashboardVehicleItem(item = carsList[index+1], onClick = {
+                                DashboardVehicleItem(
+                                    item = carsList[index+1],
+                                    owned = carsList[index+1].id in ownedModels,
+                                    onClick = {
                                     context.startActivity(
                                         Intent(context,CarLearningActivity::class.java)
                                             .putExtra("carData",carsList[index+1])

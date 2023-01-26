@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -212,18 +213,20 @@ class PassedQuizActivity : ComponentActivity() {
                                 ),
                                 onClick = {
                                     coroutineScope.launch {
+                                        val user = User(
+                                            db.optionsDao().findAllByKey("name")[0].value!!,
+                                            db.optionsDao().findAllByKey("email")[0].value!!,
+                                            db.optionsDao().findAllByKey("password")[0].value!!,
+                                            vehicleData.id,
+                                        )
+
                                         userClientAPI.addOwnedCarModel(
-                                            User(
-                                                db.optionsDao().findAllByKey("name")[0].value!!,
-                                                db.optionsDao().findAllByKey("email")[0].value!!,
-                                                db.optionsDao().findAllByKey("password")[0].value!!,
-                                                vehicleData.id,
-                                            )
+                                            user
                                         )
                                     }
 
-                                    finish()
                                     context.startActivity(Intent(context,MainActivity::class.java))
+                                    finish()
                                 }
                             )
                         }

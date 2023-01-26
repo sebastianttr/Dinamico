@@ -31,6 +31,7 @@ data class VehicleModel(
     val brand: String,
     val name: String,
     val imgResId: Int,
+    val imgResIdOwn: Int,
     val coverImgResId: Int = R.drawable.laferrari,
     val vehicleKeyInfo: List<VehicleInfo> = listOf(),
     val vehicleDescription: List<VehicleDescription> = listOf(),

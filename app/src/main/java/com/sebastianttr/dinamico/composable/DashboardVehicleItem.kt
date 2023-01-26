@@ -25,6 +25,7 @@ import com.sebastianttr.dinamico.models.VehicleModel
 @Composable
 fun DashboardVehicleItem(
     item: VehicleModel,
+    owned: Boolean = false,
     onClick: () -> Unit = {}
 ){
     Box(
@@ -63,7 +64,7 @@ fun DashboardVehicleItem(
                 .size(130.dp)
                 .padding(top = 25.dp, start = 10.dp)
                 .align(Alignment.Center),
-            painter = painterResource(id = item.imgResId),
+            painter = painterResource(id = if(owned) item.imgResIdOwn else item.imgResId),
             contentDescription = "car_picture"
         )
     }
