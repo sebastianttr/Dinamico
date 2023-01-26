@@ -150,9 +150,11 @@ class CarLearningActivity : ComponentActivity() {
                     ) {
                         item { IntroductionHeader("${vehicleData.brand} ${vehicleData.name}",vehicleData.coverImgResId) }
                         item {
+
                             Column(
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             ) {
+                                ParagraphDivider(40.dp)
                                 Text(
                                     text = "Key information",
                                     style = TextStyle(
@@ -178,7 +180,7 @@ class CarLearningActivity : ComponentActivity() {
                                     }
                                 }
 
-                                ParagraphDivider(32.dp)
+                                ParagraphDivider(40.dp)
 
                                 i = 0
 
@@ -189,8 +191,8 @@ class CarLearningActivity : ComponentActivity() {
                                     )
 
                                     i++;
-                                    if(i < vehicleData.vehicleKeyInfo.size)
-                                        ParagraphDivider(32.dp)
+                                    if(i < vehicleData.vehicleDescription.size)
+                                        ParagraphDivider(40.dp)
                                 }
                             }
                         }
@@ -218,7 +220,7 @@ class CarLearningActivity : ComponentActivity() {
                                             fontFamily = Montserrat,
                                             color = Color.White,
                                             fontWeight = FontWeight.SemiBold,
-                                            fontSize = 26.sp,
+                                            fontSize = 24.sp,
                                             textAlign = TextAlign.Center
                                         )
                                     )
@@ -232,11 +234,11 @@ class CarLearningActivity : ComponentActivity() {
                                             fontFamily = Montserrat,
                                             color = AccentStrong,
                                             fontWeight = FontWeight.Medium,
-                                            fontSize = 16.sp,
+                                            fontSize = 18.sp,
                                             textAlign = TextAlign.Center,
                                         )
                                     )
-                                    Box(modifier = Modifier.padding(top = 120.dp, bottom = 24.dp)) {
+                                    Box(modifier = Modifier.padding(top = 120.dp, bottom = 40.dp)) {
                                         SButton(
                                             text = "TAKE TEST",
                                             colors = listOf(
@@ -256,7 +258,7 @@ class CarLearningActivity : ComponentActivity() {
                                 }
                             }
                             else
-                                ParagraphDivider(32.dp)
+                                ParagraphDivider(40.dp)
                         }
                     }
                 }

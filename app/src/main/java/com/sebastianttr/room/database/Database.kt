@@ -28,10 +28,9 @@ The options we need:
 
 val dbOptions: List<Options> = listOf(
     Options(0,"Notification","false","General"),
-    Options(1,"Open Animation","false","General"),
-    Options(2,"Receive friend requests","false","General"),
-    Options(3,"Set profile to 'Public'","false","General"),
-    Options(4,"Personalization and tracking for advertising","false","Privacy"),
+    Options(1,"Receive friend requests","false","General"),
+    Options(2,"Set profile to 'Public'","false","General"),
+    Options(3,"Personalization and tracking for advertising","false","Privacy"),
 )
 
 object Database {

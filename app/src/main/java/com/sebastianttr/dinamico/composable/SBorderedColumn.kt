@@ -109,8 +109,6 @@ fun SBorderedColumnItemDivider(){
 
 @Composable
 fun SBorderedColumnGarageItem(
-    colorLeft: Color,
-    colorRight: Color,
     textLeft: String,
     textRight: String,
     amountLeft: Int,
@@ -129,8 +127,12 @@ fun SBorderedColumnGarageItem(
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .size(32.dp)
-                    .background(colorLeft)
+                    .border(
+                        border = BorderStroke(2.dp, Color(0xFF4E1F0E)),
+                        shape = CircleShape
+                    )
+                    .size(42.dp)
+                    .background(Color(0xFF8C303C))
                     .align(Alignment.CenterVertically)
             ){
                 Text(
@@ -152,7 +154,7 @@ fun SBorderedColumnGarageItem(
                 style = TextStyle(
                     fontFamily = Montserrat,
                     fontSize = 16.sp,
-                    color = colorLeft,
+                    color = Color.White,
                     fontWeight = FontWeight.Medium,
                     fontStyle = FontStyle.Italic
                 ),
@@ -167,7 +169,7 @@ fun SBorderedColumnGarageItem(
                 style = TextStyle(
                     fontFamily = Montserrat,
                     fontSize = 16.sp,
-                    color = colorRight,
+                    color = Color.White,
                     fontWeight = FontWeight.Medium,
                     fontStyle = FontStyle.Italic
                 ),
@@ -176,8 +178,12 @@ fun SBorderedColumnGarageItem(
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .size(32.dp)
-                    .background(colorRight)
+                    .border(
+                        border = BorderStroke(2.dp, Color(0xFF4E1F0E)),
+                        shape = CircleShape
+                    )
+                    .size(42.dp)
+                    .background(Color(0xFF8C303C))
                     .align(Alignment.CenterVertically)
             ){
                 Text(

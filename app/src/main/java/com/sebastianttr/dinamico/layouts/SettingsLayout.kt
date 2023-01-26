@@ -86,7 +86,7 @@ fun SettingsLayout(){
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(40.dp)
         ){
             item {
                 Column() {
@@ -253,70 +253,72 @@ fun SettingsLayout(){
                 }
             }
             item {
-                Column() {
-                        Text(
-                        text = "Delete Account",
-                        modifier = Modifier.fillMaxWidth(),
-                        style = TextStyle(
-                            fontFamily = Montserrat,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 22.sp,
-                            color = Color.White,
-                        )
-                    )
-                    SBorderedColumn {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
+                if(user != "Guest"){
+                    Column() {
                             Text(
-                                text = "Are you sure you want to delete your account? That means all data will be lost (progress, name, friends, etc.).",
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    color = Color.White,
-                                    fontFamily = Montserrat,
-                                    fontWeight = FontWeight.Medium
+                            text = "Delete Account",
+                            modifier = Modifier.fillMaxWidth(),
+                            style = TextStyle(
+                                fontFamily = Montserrat,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 22.sp,
+                                color = Color.White,
+                            )
+                        )
+                        SBorderedColumn {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "Are you sure you want to delete your account? That means all data will be lost (progress, name, friends, etc.).",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        color = Color.White,
+                                        fontFamily = Montserrat,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 )
-                            )
-                        }
-                        Box(modifier = Modifier.padding(16.dp)){
-                            SButton(
-                                text = "DELETE ACCOUNT",
-                                height = 40.dp,
-                                padding = 16.dp,
-                                colors = listOf(
-                                    Color(0xFFB91010),
-                                    Color(0xFFDC5959)
-                                ),
-                                onClick = {
-                                    coroutineScope.launch {
+                            }
+                            Box(modifier = Modifier.padding(16.dp)){
+                                SButton(
+                                    text = "DELETE ACCOUNT",
+                                    height = 40.dp,
+                                    padding = 16.dp,
+                                    colors = listOf(
+                                        Color(0xFFB91010),
+                                        Color(0xFFDC5959)
+                                    ),
+                                    onClick = {
+                                        coroutineScope.launch {
 
-                                        userClientAPI.deleteUser(
-                                            User(
-                                                db.optionsDao().findAllByKey("name")[0].value!!,
-                                                db.optionsDao().findAllByKey("email")[0].value!!,
-                                                db.optionsDao().findAllByKey("password")[0].value!!
+                                            userClientAPI.deleteUser(
+                                                User(
+                                                    db.optionsDao().findAllByKey("name")[0].value!!,
+                                                    db.optionsDao().findAllByKey("email")[0].value!!,
+                                                    db.optionsDao().findAllByKey("password")[0].value!!
+                                                )
                                             )
-                                        )
 
-                                        db.optionsDao().deleteByKey("name")
-                                        db.optionsDao().deleteByKey("email")
-                                        db.optionsDao().deleteByKey("password")
+                                            db.optionsDao().deleteByKey("name")
+                                            db.optionsDao().deleteByKey("email")
+                                            db.optionsDao().deleteByKey("password")
 
-                                        val intent = Intent(ctx.applicationContext, FirstScreenActivity::class.java)
-                                        ctx.startActivity(intent)
+                                            val intent = Intent(ctx.applicationContext, FirstScreenActivity::class.java)
+                                            ctx.startActivity(intent)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
                 }
             }
 
             item {
-                Box(modifier = Modifier.padding(bottom = 60.dp)){
+                Box(modifier = Modifier.padding(top = 80.dp, bottom = 80.dp)) {
                     SButton(
-                        text = "LOG OUT",
+                        text = if(user == "Guest") "LOG IN" else "LOG OUT",
                         height = 40.dp,
                         colors = listOf(
                             Color(0xFFFBAB18),

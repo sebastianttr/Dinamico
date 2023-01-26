@@ -100,6 +100,11 @@ fun DashboardLayout(){
 
     lateinit var db: AppDatabase
     val ctx = LocalContext.current
+    var user: String by remember {
+        mutableStateOf("Guest")
+
+    }
+
 
     var ownedModels by remember {
         mutableStateOf(emptyList<Int>())
@@ -108,10 +113,9 @@ fun DashboardLayout(){
     coroutineScope.launch {
         db = Database.getDb(ctx)
 
+        user = db.optionsDao().findAllByKey("name")[0].value!!
 
-
-
-        if(db.optionsDao().findAllByKey("name")[0].value != "Guest"){
+        if(user != "Guest"){
             val user = User(
                 db.optionsDao().findAllByKey("name")[0].value!!,
                 db.optionsDao().findAllByKey("email")[0].value!!,
@@ -220,28 +224,29 @@ fun DashboardLayout(){
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                item {
-                    Box(
-                        modifier = Modifier.padding(top = 32.dp)
-                    ){
-                        SButton(
-                            text = topButtonText,
-                            width = 350.dp,
-                            onClick = {
-                                if(topButtonText == "OWNED MODELS"){
-                                    topButtonText = "ALL CARS"
+                if(user != "Guest")
+                    item {
+                        Box(
+                            modifier = Modifier.padding(top = 32.dp)
+                        ){
+                            SButton(
+                                text = topButtonText,
+                                width = 350.dp,
+                                onClick = {
+                                    if(topButtonText == "OWNED MODELS"){
+                                        topButtonText = "ALL CARS"
 
-                                    // get all models and filter
+                                        // get all models and filter
 
-                                    carsList = listOfCars.filter { it.id in ownedModels }
-                                }else {
-                                    topButtonText = "OWNED MODELS"
-                                    carsList = listOfCars
+                                        carsList = listOfCars.filter { it.id in ownedModels }
+                                    }else {
+                                        topButtonText = "OWNED MODELS"
+                                        carsList = listOfCars
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-                }
                 items(carsList.size) { index ->
                     if(index % 2 == 0){
                         Row(

@@ -93,7 +93,7 @@ class RegisterActivity : ComponentActivity() {
                     Box(modifier = Modifier.fillMaxWidth()){
                         Image(
                             modifier = Modifier
-                                .padding(top = 211.dp)
+                                .padding(top = 220.dp)
                                 .height(36.dp)
                                 .fillMaxWidth(),
                             painter = painterResource(id = R.drawable.checker),
@@ -202,6 +202,7 @@ class RegisterActivity : ComponentActivity() {
                                                 && password == repeatPassword
                                                 && email.isNotEmpty() && email.contains("@")
                                                 && userName.isNotEmpty()
+                                                && userName != "Guest"
                                             ) {
                                                 Log.i("Register","Registering")
                                                 // all good, send request
@@ -230,13 +231,19 @@ class RegisterActivity : ComponentActivity() {
                                                 }
                                             }
                                             if (password.length < 8) {
-                                                errorMessage = "Password is too short!"
+                                                errorMessage = "Password is too short"
                                             }
                                             if (password != repeatPassword) {
-                                                errorMessage = "Repeated password is not the same!"
+                                                errorMessage = "Repeated password is not the same"
                                             }
                                             if (!email.contains("@")){
-                                                errorMessage = "Invalid email!"
+                                                errorMessage = "Invalid email"
+                                            }
+                                            if (userName == "Guest"){
+                                                errorMessage = "Username cannot be 'Guest'"
+                                            }
+                                            if (userName.isEmpty() ){
+                                                errorMessage = "Username cannot be empty"
                                             }
                                         }
                                     )

@@ -182,7 +182,7 @@ class PassedQuizActivity : ComponentActivity() {
                                         .padding(top = 55.dp, start = 10.dp)
                                         .align(Alignment.Center)
                                         ,
-                                    painter = painterResource(id = vehicleData.imgResId),
+                                    painter = painterResource(id = vehicleData.imgResIdOwn),
                                     contentDescription = "car_picture",
                                 )
                             }

@@ -77,7 +77,7 @@ class FirstScreenActivity : ComponentActivity() {
                         Image(
                             painter = painterResource(id = R.drawable.first_screen_img),
                             contentDescription = "Pic background",
-                            modifier = Modifier.height(400.dp),
+                            modifier = Modifier.height(420.dp).fillMaxWidth().align(Alignment.TopCenter),
                             contentScale = ContentScale.FillHeight
                         )
                         Column(modifier = Modifier.padding(top = 293.dp)) {

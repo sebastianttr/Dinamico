@@ -1,6 +1,7 @@
 package com.sebastianttr.dinamico.layouts
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,10 +37,24 @@ import com.sebastianttr.room.database.AppDatabase
 import com.sebastianttr.room.database.Database
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ProfileLayout(){
 
     SetDefaultSystemColors(Color(0xFF4E1F0E))
+
+    val coroutineScope = rememberCoroutineScope()
+    lateinit var db: AppDatabase
+    val ctx = LocalContext.current
+    var user: String by remember {
+        mutableStateOf("Guest")
+    }
+
+    coroutineScope.launch {
+        db = Database.getDb(ctx)
+
+        user = db.optionsDao().findAllByKey("name")[0].value!!
+    }
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,14 +74,32 @@ fun ProfileLayout(){
     ){
         item { ProfileHeader() }
         item { BasicInfoItem() }
-        item { Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            GarageSection()
-            DailyChallengesSection()
-            FriendSuggestionItem()
-        }}
+        if(user != "Guest"){
+            item { Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ConnectionsSection()
+                GarageSection()
+                DailyChallengesSection()
+                FriendSuggestionItem()
+            }}
+        }
+        else item {
+            Box(modifier = Modifier.fillMaxWidth().height(400.dp)){
+                Text(text = "Please log in to use all features",
+                    style = TextStyle(
+                        fontFamily = Montserrat,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AccentStrong,
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
     }
 }
 
@@ -149,14 +182,17 @@ fun BasicInfoItem(){
             textAlign = TextAlign.Center,
             color = Color.White
         ),
-        modifier = Modifier.padding(vertical = 14.dp)
+        modifier = Modifier.padding(top = 14.dp)
     )
+}
 
+@Composable
+fun ConnectionsSection(){
     Row(
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "13 Car Models",
+            text = "0 Car Models",
             style = TextStyle(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
@@ -167,7 +203,7 @@ fun BasicInfoItem(){
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 14.dp)
         )
         Text(
-            text = "28 Enthusiasts",
+            text = "69 Enthusiasts",
             style = TextStyle(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
@@ -182,7 +218,7 @@ fun BasicInfoItem(){
 
 @Composable
 fun GarageSection(){
-    Column() {
+    Column(modifier = Modifier.padding(top = 26.dp)) {
         Text(
             text = "Garage",
             modifier = Modifier.fillMaxWidth(),
@@ -191,28 +227,41 @@ fun GarageSection(){
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 color = Color.White,
-
-                )
+            )
         )
         SBorderedColumn {
             SBorderedColumnGarageItem (
-                Color(0xFFFF2800),Color(0xFFAAAAAA),
-                "Ferrari","Lexus",
-                3,4
+                "Ferrari","Volkswagen",
+                0,0
             )
             SBorderedColumnItemDivider()
             SBorderedColumnGarageItem (
-                Color(0xFFBF8F52),Color(0xFF4767D6),
-                "Dacia","Bugatti",
-                5,1
+                "BMW","Audi",
+                0,0
             )
+            SBorderedColumnItemDivider()
+            SBorderedColumnGarageItem (
+                "Porsche","Bugatti",
+                0,0
+            )
+            SBorderedColumnItemDivider()
+            SBorderedColumnGarageItem (
+                "Mercedes","Lamborghini",
+                0,0
+            )
+            SBorderedColumnItemDivider()
+            SBorderedColumnGarageItem (
+                "McLaren","Dacia",
+                0,0
+            )
+
         }
     }
 }
 
 @Composable
 fun DailyChallengesSection(){
-    Column() {
+    Column(modifier = Modifier.padding(top = 40.dp)) {
         Text(
             text = "Daily Challenges",
             modifier = Modifier.fillMaxWidth(),
@@ -235,7 +284,7 @@ fun DailyChallengesSection(){
 
 @Composable
 fun FriendSuggestionItem(){
-    Column() {
+    Column(modifier = Modifier.padding(top = 40.dp)) {
         Text(
             text = "Enthusiasts suggestions",
             modifier = Modifier.fillMaxWidth(),
@@ -259,7 +308,7 @@ fun FriendSuggestionItem(){
             SFriendsSuggestionCard()
         }
         Box(modifier = Modifier
-            .padding(bottom = 20.dp)
+            .padding(top = 40.dp, bottom = 40.dp)
         ){
             SButton(
                 text = "SEARCH MORE",

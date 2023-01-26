@@ -126,7 +126,7 @@ class QuizActivity : ComponentActivity() {
                         failed = true
                         changeActivity = true;
                         Log.i("Change activity now","")
-                        failedMessage = "You revved the car too much and your engine failed."
+                        failedMessage = "You revved the car too much and your engine failed"
                         cancel()
                     }else{
                         revCounter = (timeToAnswerQuizzes.toFloat() - millisUntilFinished) / timeToAnswerQuizzes.toFloat()
@@ -277,7 +277,6 @@ class QuizActivity : ComponentActivity() {
                             Box(modifier = Modifier.alpha(if (selection > -1) 1f else 0f)){
                                 SButton(
                                     text = "CONTINUE",
-                                    height = 40.dp,
                                     colors = listOf(
                                         Color(0xFFFBAB18),
                                         Color(0xFFFEDE00)
@@ -292,7 +291,7 @@ class QuizActivity : ComponentActivity() {
                                             selection = -1;
                                             failed = true;
                                             changeActivity = true;
-                                            failedMessage = "Your answer was wrong ... that might come costly."
+                                            failedMessage = "Your answer was wrong... that might come costly"
                                         }
                                         else {
                                             passed = true

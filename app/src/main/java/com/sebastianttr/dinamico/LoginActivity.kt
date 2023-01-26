@@ -108,7 +108,7 @@ class LoginActivity : ComponentActivity() {
                         )
                         Image(
                             modifier = Modifier
-                                .padding(top = 211.dp)
+                                .padding(top = 220.dp)
                                 .height(36.dp)
                                 .fillMaxWidth(),
                             painter = painterResource(id = R.drawable.checker),
