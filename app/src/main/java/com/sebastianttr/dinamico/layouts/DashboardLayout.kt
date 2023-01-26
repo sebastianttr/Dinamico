@@ -52,29 +52,24 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sebastianttr.dinamico.CarLearningActivity
 import com.sebastianttr.dinamico.QuizActivity
 import com.sebastianttr.dinamico.R
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.DashboardVehicleItem
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.composable.TopAppBarSearchView
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
+import com.sebastianttr.dinamico.models.User
 import com.sebastianttr.dinamico.models.VehicleModel
+import com.sebastianttr.dinamico.models.listOfCars
 import com.sebastianttr.dinamico.ui.theme.*
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import com.sebastianttr.room.database.dbOptions
+import kotlinx.coroutines.launch
 
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
-val listOfCars = listOf<VehicleModel>(
-    VehicleModel(0, "Ferrari","360 Spider",R.drawable.ferrari_360),
-    VehicleModel(1, "Ferrari","SF90",R.drawable.ferrari_sf90),
-    VehicleModel(2, "Ferrari","296 GTB",R.drawable.ferrari_296gtb),
-    VehicleModel(3, "Ferrari","F40",R.drawable.ferrari_f40),
-    VehicleModel(4, "Ferrari","F8 Tributo",R.drawable.ferrari_f8_tributo),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-    VehicleModel(5, "Ferrari","Monza SP2",R.drawable.ferrari_sp2),
-)
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview
@@ -82,6 +77,7 @@ val listOfCars = listOf<VehicleModel>(
 fun DashboardLayout(){
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
     var searchSectionState by remember { mutableStateOf(false)}
+    var topButtonText by remember { mutableStateOf("OWNED MODELS") }
 
     val arrowRotateAnimation: Float by animateFloatAsState(
         targetValue = if (searchSectionState) -180f else 0f,
@@ -92,6 +88,20 @@ fun DashboardLayout(){
     )
 
     val context = LocalContext.current
+
+    var carsList by remember {
+        mutableStateOf(listOfCars)
+    };
+
+    var coroutineScope = rememberCoroutineScope()
+    val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
+
+    lateinit var db: AppDatabase
+    val ctx = LocalContext.current
+
+    coroutineScope.launch {
+        db = Database.getDb(ctx)
+    }
 
     SetDefaultSystemColors(Color(0xFFFBAB18))
 
@@ -184,17 +194,34 @@ fun DashboardLayout(){
                         modifier = Modifier.padding(top = 32.dp)
                     ){
                         SButton(
-                            text = "OWNED MODELS",
+                            text = topButtonText,
                             width = 350.dp,
                             onClick = {
-                                Log.i("Quiz","Quiz")
-                                context.startActivity(Intent(context,QuizActivity::class.java))
+                                if(topButtonText == "OWNED MODELS"){
+                                    topButtonText = "ALL CARS"
+
+                                    // get all models and filter
+                                    coroutineScope.launch {
+                                        val ownedModels: List<Int> = userClientAPI.getOwnedCarModel(
+                                            User(
+                                                db.optionsDao().findAllByKey("name")[0].value!!,
+                                                db.optionsDao().findAllByKey("email")[0].value!!,
+                                                db.optionsDao().findAllByKey("password")[0].value!!,
+                                            )
+                                        ).body()!!
+
+                                        carsList = listOfCars.filter { it.id in ownedModels }
+                                    }
+
+                                }else {
+                                    topButtonText = "OWNED MODELS"
+                                    carsList = listOfCars
+                                }
                             }
                         )
                     }
-
                 }
-                items(listOfCars.size) { index ->
+                items(carsList.size) { index ->
                     if(index % 2 == 0){
                         Row(
                             modifier = Modifier
@@ -202,37 +229,26 @@ fun DashboardLayout(){
                                 .align(Alignment.CenterHorizontally),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ){
-                            DashboardVehicleItem(item = listOfCars[index], onClick = {
-                                context.startActivity(Intent(context,CarLearningActivity::class.java))
+                            DashboardVehicleItem(item = carsList[index], onClick = {
+                                context.startActivity(
+                                    Intent(context,CarLearningActivity::class.java)
+                                        .putExtra("carData",carsList[index])
+                                )
                             })
-                            if(index + 1 < listOfCars.size)
-                                DashboardVehicleItem(item = listOfCars[index+1], onClick = {
-                                    context.startActivity(Intent(context,CarLearningActivity::class.java))
+                            if(index + 1 < carsList.size)
+                                DashboardVehicleItem(item = carsList[index+1], onClick = {
+                                    context.startActivity(
+                                        Intent(context,CarLearningActivity::class.java)
+                                            .putExtra("carData",carsList[index+1])
+                                    )
                                 })
                         }
                     }
-
-                    /*LazyVerticalGrid(
-                        cells = GridCells.Fixed(2),
-                        content = {
-
-                            items(listOfCars.size) { index ->
-                                gridCellsState = GridCells.Fixed(2)
-                                DashboardVehicleItem(item = listOfCars[index], onClick = {
-                                    context.startActivity(Intent(context,CarLearningActivity::class.java))
-                                })
-                            }
-                        },
-                        contentPadding = PaddingValues(
-                            start = 12.dp,
-                            top = 16.dp,
-                            end = 12.dp,
-                            bottom = 16.dp
-                        ),
-                    )*/
                 }
                 item {
-                    Box(modifier = Modifier.height(62.dp).fillMaxWidth())
+                    Box(modifier = Modifier
+                        .height(62.dp)
+                        .fillMaxWidth())
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.sebastianttr.dinamico
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -19,8 +20,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -32,12 +35,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sebastianttr.dinamico.clients.UserClient
+import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
+import com.sebastianttr.dinamico.models.User
+import com.sebastianttr.dinamico.models.VehicleModel
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
+import com.sebastianttr.room.database.AppDatabase
+import com.sebastianttr.room.database.Database
+import kotlinx.coroutines.launch
 
 class PassedQuizActivity : ComponentActivity() {
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,7 +59,18 @@ class PassedQuizActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
 
-            var context = LocalContext.current
+            val context = LocalContext.current
+            val vehicleData: VehicleModel = intent.getSerializableExtra("carData") as VehicleModel
+
+            var coroutineScope = rememberCoroutineScope()
+            val userClientAPI = UserClientService.getInstance().create(UserClient::class.java)
+
+            lateinit var db: AppDatabase
+            val ctx = LocalContext.current
+
+            coroutineScope.launch {
+                db = Database.getDb(ctx)
+            }
 
             val appearAnimation: Float by animateFloatAsState(
                 targetValue = if (startAnimationFlag) 1f else 0f,
@@ -142,7 +164,7 @@ class PassedQuizActivity : ComponentActivity() {
                                 ) {
                                     Text(
                                         modifier = Modifier.align(Alignment.TopCenter),
-                                        text = "LaFerrari",
+                                        text = vehicleData.name,
                                         style = TextStyle(
                                             fontSize = 32.sp,
                                             color = Color.White,
@@ -157,9 +179,10 @@ class PassedQuizActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .size(280.dp)
                                         .padding(top = 55.dp, start = 10.dp)
-                                        .align(Alignment.Center),
-                                    painter = painterResource(id = R.drawable.laferrari),
-                                    contentDescription = "car_picture"
+                                        .align(Alignment.Center)
+                                        ,
+                                    painter = painterResource(id = vehicleData.imgResId),
+                                    contentDescription = "car_picture",
                                 )
                             }
                             Text(
@@ -188,6 +211,17 @@ class PassedQuizActivity : ComponentActivity() {
                                     Color(0xFFFEDE00)
                                 ),
                                 onClick = {
+                                    coroutineScope.launch {
+                                        userClientAPI.addOwnedCarModel(
+                                            User(
+                                                db.optionsDao().findAllByKey("name")[0].value!!,
+                                                db.optionsDao().findAllByKey("email")[0].value!!,
+                                                db.optionsDao().findAllByKey("password")[0].value!!,
+                                                vehicleData.id,
+                                            )
+                                        )
+                                    }
+
                                     finish()
                                     context.startActivity(Intent(context,MainActivity::class.java))
                                 }

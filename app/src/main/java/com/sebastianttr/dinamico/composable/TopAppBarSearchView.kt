@@ -24,13 +24,16 @@ fun TopAppBarSearchView(
     searchSectionState: Boolean
 ) {
     var carList = mapOf<String, Int>(
-        "Lexus" to R.drawable.lexus_logo,
-        "Dacia" to R.drawable.dacia_logo,
+        "VW" to R.drawable.vw,
+        "BMW" to R.drawable.bmw,
+        "Audi" to R.drawable.audi,
         "Porsche" to R.drawable.porsche_logo,
         "Bugatti" to R.drawable.bugatti_logo,
-        "Bugatti2" to R.drawable.bugatti_logo,
-        "Bugatti3" to R.drawable.bugatti_logo,
-        "Bugatti4" to R.drawable.bugatti_logo,
+        "Mercedes-Benz" to R.drawable.mercedes,
+        "Lexus" to R.drawable.lexus_logo,
+        "Lamborghini" to R.drawable.lambo,
+        "McLaren" to R.drawable.mclaren,
+        "Dacia" to R.drawable.dacia_logo
     )
 
     val scrollState: ScrollState = rememberScrollState()

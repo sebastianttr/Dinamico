@@ -7,10 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
-import android.widget.GridLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -19,15 +17,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,30 +36,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
-import com.sebastianttr.dinamico.layouts.listOfCars
+import com.sebastianttr.dinamico.models.VehicleModel
 import com.sebastianttr.dinamico.models.VehicleQuiz
-import com.sebastianttr.dinamico.ui.theme.*
-import kotlinx.coroutines.NonCancellable.cancel
-import kotlinx.coroutines.cancel
-import kotlin.math.pow
+import com.sebastianttr.dinamico.ui.theme.AccentStrong
+import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
+import com.sebastianttr.dinamico.ui.theme.Montserrat
 import kotlin.math.sin
 
 
-val quiz:List<VehicleQuiz> = listOf(
-    VehicleQuiz(0,"When was the LaFerrari released?", listOf("2012","2018","2013","2010"),3),
-    VehicleQuiz(1,"What are the the variants that existed", listOf("Sedan","Coupe & Aperta","Coupe","SUV"),2),
-    VehicleQuiz(2,"What was the max power output of the car?", listOf("950hp","900hp","650hp","1000hp"),1),
-    VehicleQuiz(3,"The LaFerrari had a Top Speed of ___ km/h.", listOf("312","389","297","352"),4)
-)
+
 
 class QuizActivity : ComponentActivity() {
 
@@ -94,8 +85,11 @@ class QuizActivity : ComponentActivity() {
                 mutableStateOf(false)
             };
 
-
             val context:Context = LocalContext.current
+
+            val vehicleData: VehicleModel = intent.getSerializableExtra("carData") as VehicleModel
+
+            val quiz:List<VehicleQuiz> = vehicleData.vehicleQuizzes
 
             val leaveAnimationsState: Float by animateFloatAsState(
                 targetValue = if (!changeActivity) 1f else 0f,
@@ -104,9 +98,7 @@ class QuizActivity : ComponentActivity() {
                     easing = FastOutSlowInEasing
                 ),
                 finishedListener = {
-                    Log.i("He", "Changing Activity")
                     if(failed){
-                        Log.i("Going to FailedQuiz","")
                         finish()
                         context.startActivity(Intent(context,FailedQuizActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -116,7 +108,11 @@ class QuizActivity : ComponentActivity() {
                     else if (passed){
                         Log.i("Going to PassedQuiz","")
                         finish()
-                        context.startActivity(Intent(context,PassedQuizActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
+                        context.startActivity(
+                            Intent(context,PassedQuizActivity::class.java)
+                                .putExtra("carData",vehicleData)
+                                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                        )
                     }
                 }
             )

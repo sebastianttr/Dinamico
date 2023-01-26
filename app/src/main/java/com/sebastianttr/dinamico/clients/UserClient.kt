@@ -20,4 +20,10 @@ interface UserClient {
     @POST("updateUser")
     suspend fun updateUser(@Body user : User) : Response<String>
 
+    @POST("addOwnedModelToUser")
+    suspend fun addOwnedCarModel(@Body user : User) : Response<String>
+
+    @POST("getOwnedModelOfUser")
+    suspend fun getOwnedCarModel(@Body user : User) : Response<List<Int>>
+
 }
