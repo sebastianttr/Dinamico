@@ -152,7 +152,7 @@ class CarLearningActivity : ComponentActivity() {
                         item {
 
                             Column(
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                                modifier = Modifier.padding(horizontal = 0.dp)
                             ) {
                                 ParagraphDivider(40.dp)
                                 Text(
@@ -162,37 +162,77 @@ class CarLearningActivity : ComponentActivity() {
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 22.sp,
                                         color = Color.White
-                                    )
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 16.dp)
                                 )
 
                                 var i = 0
 
-                                SBorderedColumn {
-                                    for(vehicleInfo in vehicleData.vehicleKeyInfo){
-                                        SBorderedColumnItemTitle(text = vehicleInfo.category)
-                                        for(vehicleStat in vehicleInfo.stat){
-                                            SBorderedColumnDescriptionItem(key = vehicleStat.stat, value = vehicleStat.description)
-                                        }
+                                Box(
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                ){
+                                    SBorderedColumn {
+                                        for(vehicleInfo in vehicleData.vehicleKeyInfo){
+                                            SBorderedColumnItemTitle(text = vehicleInfo.category)
+                                            for(vehicleStat in vehicleInfo.stat){
+                                                SBorderedColumnDescriptionItem(key = vehicleStat.stat, value = vehicleStat.description)
+                                            }
 
-                                        i++;
-                                        if(i < vehicleData.vehicleKeyInfo.size)
-                                            SBorderedColumnItemDivider()
+                                            i++;
+                                            if(i < vehicleData.vehicleKeyInfo.size)
+                                                SBorderedColumnItemDivider()
+                                        }
                                     }
                                 }
 
-                                ParagraphDivider(40.dp)
+
+                                ParagraphDivider(60.dp)
 
                                 i = 0
 
+
                                 for(vehicleDescription in vehicleData.vehicleDescription){
-                                    Paragraph(
-                                        title = vehicleDescription.title,
-                                        content = vehicleDescription.text
-                                    )
+                                    if(vehicleDescription.title == "Design" || vehicleDescription.title == "Specifications"){
+                                        Box(){
+                                            Box(modifier = Modifier.fillMaxSize()){
+                                                Column(verticalArrangement = Arrangement.SpaceBetween) {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.ic_car_learning_vector_1),
+                                                        contentDescription = "vector",
+                                                        modifier = Modifier.fillMaxWidth().offset(y = 4.dp),
+                                                        contentScale = ContentScale.FillWidth
+                                                    )
+                                                    Box(modifier = Modifier
+                                                        .fillMaxHeight()
+                                                        .fillMaxWidth()
+                                                        .background(AccentLight)
+                                                    ){
+                                                        Paragraph(
+                                                            title = vehicleDescription.title,
+                                                            content = vehicleDescription.text,
+                                                            textColor = Color.Black
+                                                        )
+                                                    }
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.ic_car_learning_vector_2),
+                                                        contentDescription = "vector",
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        contentScale = ContentScale.FillWidth
+                                                    )
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                        Paragraph(
+                                            title = vehicleDescription.title,
+                                            content = vehicleDescription.text
+                                        )
 
                                     i++;
                                     if(i < vehicleData.vehicleDescription.size)
-                                        ParagraphDivider(40.dp)
+                                        ParagraphDivider(60.dp)
                                 }
                             }
                         }
@@ -204,7 +244,8 @@ class CarLearningActivity : ComponentActivity() {
                                 ) {
                                     Image(
                                         modifier = Modifier
-                                            .padding(vertical = 40.dp)
+                                            .padding(bottom = 40.dp)
+                                            .offset(y = (-28).dp)
                                             .height(36.dp)
                                             .fillMaxWidth(),
                                         painter = painterResource(id = R.drawable.checker),
@@ -310,30 +351,36 @@ fun IntroductionHeader(name: String, img: Int){
 @Composable
 fun Paragraph(
     title: String,
-    content: String
+    content: String,
+    textColor: Color = Color.White
 ){
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
-        text = title,
-        style = TextStyle(
-            fontFamily = Montserrat,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 22.sp,
-            color = Color.White
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            text = title,
+            style = TextStyle(
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 22.sp,
+                color = textColor
+            )
         )
-    )
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = content,
-        style = TextStyle(
-            fontFamily = Montserrat,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            color = Color.White
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = content,
+            style = TextStyle(
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                color = textColor
+            )
         )
-    )
+    }
+
 }
 
 @Composable

@@ -48,6 +48,10 @@ import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sebastianttr.dinamico.CarLearningActivity
 import com.sebastianttr.dinamico.QuizActivity

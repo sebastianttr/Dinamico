@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.LottieAnimationView
 import com.sebastianttr.dinamico.composable.SButton
 import com.sebastianttr.dinamico.config.SetDefaultSystemColors
 import com.sebastianttr.dinamico.models.VehicleModel
@@ -49,7 +50,6 @@ import com.sebastianttr.dinamico.ui.theme.AccentStrong
 import com.sebastianttr.dinamico.ui.theme.DinamicoTheme
 import com.sebastianttr.dinamico.ui.theme.Montserrat
 import kotlin.math.sin
-
 
 
 
@@ -98,20 +98,20 @@ class QuizActivity : ComponentActivity() {
                     easing = FastOutSlowInEasing
                 ),
                 finishedListener = {
-                    if(failed){
+                    if (passed){
                         finish()
-                        context.startActivity(Intent(context,FailedQuizActivity::class.java)
+                        context.startActivity(Intent(context,PassedQuizActivity::class.java)
+                            .putExtra("carData", vehicleData)
                             .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                            .putExtra("msg",failedMessage)
+
                         )
                     }
-                    else if (passed){
-                        Log.i("Going to PassedQuiz","")
+                    else if(failed){
                         finish()
-                        context.startActivity(
-                            Intent(context,PassedQuizActivity::class.java)
-                                .putExtra("carData",vehicleData)
-                                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                        context.startActivity(Intent(context,FailedQuizActivity::class.java)
+                            .putExtra("msg",failedMessage)
+                            .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
                         )
                     }
                 }
@@ -121,7 +121,7 @@ class QuizActivity : ComponentActivity() {
             timer = object : CountDownTimer(timeToAnswerQuizzes.toLong(), 10) {
                 override fun onTick(millisUntilFinished: Long) {
 
-                    if (revCounter >= .99f && !passed){
+                    if (revCounter >= 0.99f && !passed){
                         revCounter = 1.0f
                         failed = true
                         changeActivity = true;
@@ -133,9 +133,9 @@ class QuizActivity : ComponentActivity() {
 
                         if(revCounter < 0.6f)
                             revCounterColor = Color(0xFF387938)
-                        else if(revCounter < 0.75f)
+                        else if(revCounter <= 0.88f)
                             revCounterColor = Color(0xFFD68A2C)
-                        else if (revCounter > 0.75f){
+                        else if (revCounter > 0.88f){
                             revCounterLimitFrequency *= 1.012f
                             //Log.i("Freq", "Frequency : " + sin(2 * Math.PI * revCounterLimitFrequency).toFloat()*0.5f)
                             revCounterColor = Color(0xFFD62C2C)
@@ -218,9 +218,10 @@ class QuizActivity : ComponentActivity() {
                                         fontWeight = FontWeight.Black,
                                         fontStyle = FontStyle.Italic,
                                         fontFamily = Montserrat,
-                                        color = AccentStrong
+                                        color = Color(0xFFFBAB18)
                                     )
                                 )
+
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
                                     text = quiz[quizIndex].question,
@@ -251,7 +252,7 @@ class QuizActivity : ComponentActivity() {
                                                     ),
                                                     color =
                                                     if (selection == index)
-                                                        AccentStrong
+                                                        Color(0xFFFBAB18)
                                                     else
                                                         Color(0xFF434456)
                                                 )
@@ -282,19 +283,22 @@ class QuizActivity : ComponentActivity() {
                                         Color(0xFFFEDE00)
                                     ),
                                     onClick = {
-                                        if(quizIndex + 1 < quiz.size && selection + 1 == quiz[quizIndex].correctAnswer){
-                                            quizIndex++
-                                            selection = -1;
-                                            Log.i("Increase", "Increasing: $quizIndex")
-                                        }
-                                        else if (selection + 1 != quiz[quizIndex].correctAnswer){
-                                            selection = -1;
+                                        if (selection + 1 != quiz[quizIndex].correctAnswer){
                                             failed = true;
+                                            passed = false;
                                             changeActivity = true;
                                             failedMessage = "Your answer was wrong... that might come costly"
                                         }
-                                        else {
-                                            passed = true
+                                        else if(quizIndex + 1 < quiz.size && selection + 1 == quiz[quizIndex].correctAnswer){
+                                            quizIndex++
+                                            failed = false;
+                                            passed = false;
+                                            selection = -1;
+                                            Log.i("Increase", "Increasing: $quizIndex")
+                                        }
+                                        else if(selection + 1 == quiz[quizIndex].correctAnswer){
+                                            passed = true;
+                                            failed = false;
                                             changeActivity = true;
                                         }
                                     }

@@ -45,7 +45,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
 }
+
 
 dependencies {
     def nav_version = "2.5.3"
@@ -82,4 +84,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    def lottieVersion = "5.2.0"
+    implementation "com.airbnb.android:lottie-compose:$lottieVersion"
 }

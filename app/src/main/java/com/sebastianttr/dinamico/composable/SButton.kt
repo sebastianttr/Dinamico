@@ -94,6 +94,7 @@ fun SButton(
                                     onClickOffset = 0.dp;
                                 } else {
                                     //CANCELED
+                                    onClickOffset = 0.dp;
                                 }
                             },
                             onTap = {

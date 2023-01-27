@@ -32,7 +32,7 @@ data class VehicleModel(
     val name: String,
     val imgResId: Int,
     val imgResIdOwn: Int,
-    val coverImgResId: Int = R.drawable.laferrari,
+    val coverImgResId: Int,
     val vehicleKeyInfo: List<VehicleInfo> = listOf(),
     val vehicleDescription: List<VehicleDescription> = listOf(),
     val vehicleQuizzes: List<VehicleQuiz> = listOf()

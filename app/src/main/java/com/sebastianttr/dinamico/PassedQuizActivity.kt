@@ -35,7 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.sebastianttr.dinamico.clients.UserClient
 import com.sebastianttr.dinamico.clients.UserClientService
 import com.sebastianttr.dinamico.composable.SButton
@@ -99,7 +104,6 @@ class PassedQuizActivity : ComponentActivity() {
 
             DinamicoTheme {
                 // A surface container using the 'background' color from the theme
-
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -116,13 +120,20 @@ class PassedQuizActivity : ComponentActivity() {
                         .alpha(appearAnimation),
                     color = Color.Transparent
                 ) {
+                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.fireworks))
+
+                    LottieAnimation(composition, iterations = LottieConstants.IterateForever, modifier = Modifier.fillMaxWidth().offset(y = 40.dp))
+
                     Box(modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                     ){
                         Box(
-                            modifier = Modifier.padding(top = 194.dp).fillMaxWidth().align(Alignment.TopCenter)
+                            modifier = Modifier
+                                .padding(top = 194.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.TopCenter)
                         ){
                             Text(
                                 modifier = Modifier.align(Alignment.TopCenter),
@@ -142,12 +153,12 @@ class PassedQuizActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxHeight()
                         ){
                             Box(
-                                modifier = Modifier.padding(
-                                    top = 48.dp,
-                                    start = 4.5.dp,
-                                    end = 4.5.dp
-                                )
-                                    .clickable {  }
+                                modifier = Modifier
+                                    .padding(
+                                        top = 48.dp,
+                                        start = 4.5.dp,
+                                        end = 4.5.dp
+                                    )
                                     .fillMaxWidth()
                             ){
                                 Image(
@@ -178,7 +189,7 @@ class PassedQuizActivity : ComponentActivity() {
 
                                 Image(
                                     modifier = Modifier
-                                        .size(280.dp)
+                                        .size(200.dp)
                                         .padding(top = 55.dp, start = 10.dp)
                                         .align(Alignment.Center)
                                         ,
